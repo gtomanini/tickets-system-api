@@ -1,5 +1,6 @@
 package com.br.tickets.models;
 
+import com.br.tickets.enums.UserRole;
 import com.br.tickets.models.base.UUIDIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -46,6 +47,10 @@ public class User extends UUIDIdEntity implements UserDetails {
 
     private Boolean mailing;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+
     @Column(columnDefinition = "TEXT")
     private String extra;
 
@@ -58,7 +63,7 @@ public class User extends UUIDIdEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> "ROLE_" + role.name());
     }
 
     @Override

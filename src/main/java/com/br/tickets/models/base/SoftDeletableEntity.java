@@ -10,8 +10,6 @@ import lombok.Setter;
 @MappedSuperclass
 @SQLDelete(sql = "UPDATE #{#entityName} SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
-@Getter
-@Setter
 public abstract class SoftDeletableEntity extends AuditableEntity{
 
     @Column(nullable = true, columnDefinition = "BOOLEAN DEFAULT FALSE")
