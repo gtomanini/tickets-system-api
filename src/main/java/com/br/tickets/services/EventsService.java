@@ -44,14 +44,18 @@ public class EventsService {
 
         Page<Event> page = eventsRepository.findAll(spec, pageable);
 
-        return page.map(event -> {
-            EventListDTO dto = new EventListDTO();
-            dto.setId(event.getId());
-            dto.setName(event.getName());
-//            dto.setDate(event.getDate());
-//            dto.setStatus(event.getStatus());
-            return dto;
-        });
+        return page.map(event -> new EventListDTO(
+                    event.getId(),
+                    event.getName(),
+                    event.getStartDate(),
+                    event.getStatus(),
+                    event.getDescription(),
+                    event.getStartDate(),
+                    event.getEndDate(),
+                    event.getFeatured(),
+                    event.getClosed()
+            )
+        );
     }
 
 }

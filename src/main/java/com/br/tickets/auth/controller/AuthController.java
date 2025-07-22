@@ -5,16 +5,20 @@ import com.br.tickets.auth.services.AuthService;
 import com.br.tickets.auth.services.CustomUserDetailsService;
 import com.br.tickets.auth.services.JwtService;
 import com.br.tickets.models.dto.AuthRequest;
+import com.br.tickets.models.dto.JwtResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/auth")
+@Component
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -27,7 +31,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthRequest request) {
         String token = authService.login(request);
-        return ResponseEntity.ok("Bearer " + token);
+        JwtResponse response = new JwtResponse("Bearer " + token);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")

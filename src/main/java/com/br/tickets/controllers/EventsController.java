@@ -1,22 +1,13 @@
 package com.br.tickets.controllers;
 
-import com.br.tickets.models.Event;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
 import com.br.tickets.services.EventsService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/events")
@@ -35,6 +26,7 @@ public class EventsController {
 ////        return ResponseEntity.ok().body(eventsService.findAll());
 //    }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     public Page<EventListDTO> list(
             @RequestParam(required = false) String name,

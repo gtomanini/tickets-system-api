@@ -16,6 +16,6 @@ public abstract class UUIDIdEntity extends SoftDeletableEntity {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "UUID")
     protected UUID id;
 }

@@ -1,16 +1,15 @@
 package com.br.tickets.models.dto;
 
 import java.time.LocalDateTime;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Data
-@Getter
-@Setter
-public class EventListDTO {
-    private Long id;
-    private String name;
-    private LocalDateTime date;
-    private String status;
-}
+public record EventListDTO(
+    Long id,
+    String name,
+    LocalDateTime date,
+    String status,
+    String description,
+    LocalDateTime startDate,
+    LocalDateTime endDate,
+    Boolean featured,
+    Boolean closed
+){}
