@@ -2,10 +2,7 @@ package com.br.tickets.models;
 
 import com.br.tickets.models.base.AutoIncrementIdEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Table(name = "events")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
 public class Event extends AutoIncrementIdEntity {

@@ -1,5 +1,7 @@
 package com.br.tickets.controllers;
 
+import com.br.tickets.models.Event;
+import com.br.tickets.models.dto.CreateEventDTO;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
 import com.br.tickets.services.EventsService;
@@ -13,20 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/events")
 public class EventsController {
 
-
     private final EventsService eventsService;
 
     public EventsController(EventsService eventsService) {
         this.eventsService = eventsService;
     }
 
-//    @GetMapping
-//    public List<Event> getEvents() {
-//        return eventsService.getAllEvents();
-////        return ResponseEntity.ok().body(eventsService.findAll());
-//    }
-
-    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     public Page<EventListDTO> list(
             @RequestParam(required = false) String name,
@@ -46,5 +40,10 @@ public class EventsController {
         Pageable pageable = PageRequest.of(page, size, sorting);
 
         return eventsService.searchEvents(criteria, pageable);
+    }
+
+    @PostMapping
+    public Event create(@RequestBody CreateEventDTO eventListDTO) {
+        return eventsService.saveEvent(eventListDTO);
     }
 }

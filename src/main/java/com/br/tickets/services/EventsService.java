@@ -1,5 +1,6 @@
 package com.br.tickets.services;
 
+import com.br.tickets.models.dto.CreateEventDTO;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
 import com.br.tickets.repositories.EventsRepository;
@@ -56,6 +57,19 @@ public class EventsService {
                     event.getClosed()
             )
         );
+    }
+
+    public Event saveEvent(CreateEventDTO dto) {
+        Event event = Event.builder()
+                .name(dto.name())
+                .status(dto.status())
+                .description(dto.description())
+                .startDate(dto.startDate())
+                .endDate(dto.endDate())
+                .featured(dto.featured())
+                .build();
+
+        return eventsRepository.save(event);
     }
 
 }
