@@ -1,8 +1,6 @@
 package com.br.tickets.auth.config;
 
 import com.br.tickets.auth.filter.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-//@RequiredArgsConstructor
+
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -40,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
 //                        .requestMatchers("/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/user/**").hasRole("USER")
 //                        .requestMatchers("/organizer/**").hasRole("ORGANIZER")
