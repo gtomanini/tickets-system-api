@@ -7,6 +7,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.Fetch;
+
 @Entity
 @Table(name = "events")
 @AllArgsConstructor
@@ -52,21 +54,16 @@ public class Event extends AutoIncrementIdEntity {
     private Organizer organizer;
 
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-//    @OrderBy("variantOf ASC, amount ASC")
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
     private List<Ticket> tickets;
-
-//    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-//    @OrderBy("amount ASC")
-//    private List<Ticket> ticketsWithoutVariants;
 
 //    @ManyToMany
 //    @JoinTable(
-//            name = "event_chair",
+//            name = "event_seats",
 //            joinColumns = @JoinColumn(name = "event_id"),
-//            inverseJoinColumns = @JoinColumn(name = "chair_id")
+//            inverseJoinColumns = @JoinColumn(name = "seat_id")
 //    )
-//    private List<Seat> chairs;
+//    private List<Seat> seats;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Order> orders;
@@ -86,32 +83,13 @@ public class Event extends AutoIncrementIdEntity {
 //    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
 //    private List<DiscountEntity> discounts;
 //
-//    @OneToOne
-//    @JoinColumn(name = "age_rating_id", referencedColumnName = "id")
-//    private AgeRatingEntity ageRating;
+   @OneToOne
+   @JoinColumn(name = "age_rating_id", referencedColumnName = "id")
+   private AgeRating ageRating;
 //
 //    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
 //    private List<EventTransferEntity> transfers;
 //
-//    @Transient
-//    public BigDecimal getProgress() {
-//        /*
-//        BigDecimal sum = orders.stream()
-//            .flatMap(order -> order.getRewards().stream())
-//            .map(Reward::getAmount)
-//            .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        BigDecimal goal = rewards.stream()
-//            .map(reward -> reward.getAmount().multiply(BigDecimal.valueOf(reward.getQuantity())))
-//            .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        try {
-//            return sum.multiply(BigDecimal.valueOf(100)).divide(goal, 2, RoundingMode.HALF_UP);
-//        } catch (Exception e) {
-//            return BigDecimal.ZERO;
-//        }
-//        */
-//        return BigDecimal.ZERO;
-//    }
+
 }
 

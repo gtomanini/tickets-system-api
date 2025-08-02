@@ -18,7 +18,7 @@ public class Ticket extends UUIDIdEntity {
     private String name;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
+    private Integer amount;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal netAmount;
@@ -28,8 +28,8 @@ public class Ticket extends UUIDIdEntity {
     @Column(length = 1000)
     private String obs;
 
-    @Column(name = "ends_at")
-    private LocalDateTime endsAt;
+    @Column(name = "sales_ends_at")
+    private LocalDateTime saleEndsAt;
 
 
 //    @ManyToOne
