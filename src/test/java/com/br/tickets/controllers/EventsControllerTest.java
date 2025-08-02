@@ -1,94 +1,117 @@
 package com.br.tickets.controllers;
 
+import com.br.tickets.config.TestSecurityConfig;
 import com.br.tickets.models.Event;
 import com.br.tickets.models.dto.CreateEventDTO;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
+import com.br.tickets.repositories.EventsRepository;
 import com.br.tickets.services.EventsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+@ExtendWith(MockitoExtension.class)
+@Import(TestSecurityConfig.class)
 public class EventsControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
+    @Mock
     private EventsService eventsService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Mock
+    private EventsRepository eventsRepository;
 
-    @Test
-    void testCreateEvent() throws Exception {
-        CreateEventDTO dto = new CreateEventDTO(
-                "Show Teste",
-                "1",
-                "Descrição do evento",
-                LocalDateTime.of(2025, 8, 10, 19, 0),
-                LocalDateTime.of(2025, 8, 10, 23, 0),
-                true
-        );
+    @InjectMocks
+    private EventsController eventsController;
 
-        Event savedEvent = new Event();
-        savedEvent.setId(1L);
-        savedEvent.setName(dto.name());
-        savedEvent.setStatus(dto.status());
-        savedEvent.setDescription(dto.description());
-        savedEvent.setStartDate(dto.startDate());
-        savedEvent.setEndDate(dto.endDate());
-        savedEvent.setFeatured(dto.featured());
-        savedEvent.setClosed(false);
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-        Mockito.when(eventsService.saveEvent(Mockito.any())).thenReturn(savedEvent);
-
-        mockMvc.perform(post("/api/events")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Show Teste")));
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(eventsController).build();
     }
 
     @Test
-    void testListEvents() throws Exception {
-        EventListDTO eventDto = new EventListDTO(
-                1L,
-                "Evento 1",
-                LocalDateTime.of(2025, 8, 10, 20, 0),
-                "active",
-                "Descrição",
-                LocalDateTime.of(2025, 8, 10, 19, 0),
-                LocalDateTime.of(2025, 8, 10, 23, 0),
-                true,
-                false
-        );
+    void list_noParams_returnsPageOfEvents() throws Exception {
 
-        Page<EventListDTO> page = new PageImpl<>(List.of(eventDto));
+        Pageable pageable = PageRequest.of(0, 10);
 
-        Mockito.when(eventsService.searchEvents(Mockito.any(), Mockito.any(Pageable.class)))
-                .thenReturn(page);
+        EventListDTO eventListDTO = new EventListDTO(1L, "Test Event", "ACTIVE", "Test Description", null, null, false, false);   
+        List<EventListDTO> content = Collections.singletonList(eventListDTO);
+
+        Page<EventListDTO> expectedPage = new PageImpl<>(content, pageable, content.size());
+        
+        when(eventsService.searchEvents(any(EventSearchCriteria.class), any(Pageable.class)))
+                .thenReturn(expectedPage);
+
+        mockMvc.perform(get("/api/events"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].name").value("Test Event"))
+            .andExpect(jsonPath("$.pageable.pageSize").value(10)) // Exemplo de outra verificação
+            .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void list_withNameParam_returnsFilteredPageOfEvents() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        EventListDTO eventListDTO = new EventListDTO(1L, "Filtered Event", "ACTIVE", "Desc", null, null, false, false);
+        List<EventListDTO> content = Collections.singletonList(eventListDTO);
+        Page<EventListDTO> expectedPage = new PageImpl<>(content, pageable, content.size());
+
+        when(eventsService.searchEvents(any(EventSearchCriteria.class), any(Pageable.class)))
+            .thenReturn(expectedPage);
 
         mockMvc.perform(get("/api/events")
-                        .param("page", "0")
-                        .param("size", "10")
-                        .param("sort", "name,desc"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id", is(1)))
-                .andExpect(jsonPath("$.content[0].name", is("Evento 1")));
+            .param("name", "Filtered Event")) // Adiciona o parâmetro à URL
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].name").value("Filtered Event"));
+    }
+
+
+    @Test
+    void create_validEvent_returnsCreatedEvent() throws Exception {
+        CreateEventDTO createDto = new CreateEventDTO("New Event", "Description of new event", null, null, null, null); // Supondo que seu DTO de criação tenha setters
+
+        Event createdEvent = new Event();
+        createdEvent.setId(1L);
+        createdEvent.setName("New Event");
+        createdEvent.setDescription("Description of new event");
+        createdEvent.setStatus("ACTIVE"); 
+
+        when(eventsService.saveEvent(any(CreateEventDTO.class)))
+            .thenReturn(createdEvent);
+
+        mockMvc.perform(post("/api/events") 
+            .contentType(MediaType.APPLICATION_JSON) 
+            .content(this.objectMapper.writeValueAsString(createDto))) 
+            .andExpect(status().isOk()) 
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value("New Event"))
+            .andExpect(jsonPath("$.description").value("Description of new event"));
     }
 }

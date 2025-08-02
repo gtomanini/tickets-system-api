@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 public record EventListDTO(
     Long id,
     String name,
-    LocalDateTime date,
     String status,
     String description,
     LocalDateTime startDate,
