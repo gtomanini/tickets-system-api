@@ -61,7 +61,7 @@ public class EventsControllerTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        EventListDTO eventListDTO = new EventListDTO(1L, "Test Event", "ACTIVE", "Test Description", null, null, false, false);   
+        EventListDTO eventListDTO = new EventListDTO(1L, "Test Event", "ACTIVE", "Test Description", null, null, null, false, false);   
         List<EventListDTO> content = Collections.singletonList(eventListDTO);
 
         Page<EventListDTO> expectedPage = new PageImpl<>(content, pageable, content.size());
@@ -79,7 +79,7 @@ public class EventsControllerTest {
     @Test
     void list_withNameParam_returnsFilteredPageOfEvents() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
-        EventListDTO eventListDTO = new EventListDTO(1L, "Filtered Event", "ACTIVE", "Desc", null, null, false, false);
+        EventListDTO eventListDTO = new EventListDTO(1L, "Filtered Event", "ACTIVE", "Desc", null, null, null, false, false);
         List<EventListDTO> content = Collections.singletonList(eventListDTO);
         Page<EventListDTO> expectedPage = new PageImpl<>(content, pageable, content.size());
 

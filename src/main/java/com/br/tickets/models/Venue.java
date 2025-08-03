@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class Venue extends AutoIncrementIdEntity {
 
     @Column(nullable = false)
@@ -24,7 +26,7 @@ public class Venue extends AutoIncrementIdEntity {
     private Double latitude;
 
     @Column(columnDefinition = "TEXT")
-    private String plant;
+    private String plant_url;
 
     @Column(columnDefinition = "TEXT")
     private String photos;

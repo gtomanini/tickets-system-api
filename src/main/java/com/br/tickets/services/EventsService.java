@@ -54,6 +54,7 @@ public class EventsService {
                     event.getDescription(),
                     event.getStartDate(),
                     event.getEndDate(),
+                    event.getVenue(), 
                     event.getFeatured(),
                     event.getClosed()
             )
