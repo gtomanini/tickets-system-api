@@ -11,6 +11,8 @@ import org.hibernate.annotations.GenericGenerator;
 import java.util.UUID;
 
 @MappedSuperclass
+@Getter
+@Setter
 public abstract class UUIDIdEntity extends SoftDeletableEntity {
 
     @Id
