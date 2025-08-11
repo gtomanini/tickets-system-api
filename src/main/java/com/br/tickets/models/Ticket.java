@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "tickets")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Ticket extends UUIDIdEntity {
 
