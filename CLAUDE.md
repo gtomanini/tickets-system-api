@@ -71,18 +71,18 @@ All entities are soft-deleted. Never call `repository.deleteById()` directly —
 ## Code Patterns
 
 ### Controllers
-- Class annotations: `@RestController` + `@RequestMapping("/api")`
-- Inject services via `@Autowired` (current project convention)
+- Class annotations: `@RestController` + `@RequestMapping("/api")` + `@AllArgsConstructor`
+- Inject services via constructor (`@AllArgsConstructor` + `private final`) — no `@Autowired`
 - Return `ResponseEntity<T>` for paginated GETs; direct return for simple POSTs
 - Never put business logic in a controller
 
 ```java
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class ExampleController {
 
-    @Autowired
-    private ExampleService exampleService;
+    private final ExampleService exampleService;
 
     @GetMapping("/examples")
     public ResponseEntity<Page<ExampleListDTO>> list(
@@ -245,4 +245,4 @@ JWT_SECRET=<secret>
 4. **DTOs as records** — never create a mutable class when a record works
 5. **Do not remove** commented-out code without understanding why it was commented out
 6. **Soft delete** — never use `deleteById`; always `repository.delete(entity)` so `@SQLDelete` fires
-7. **Constructor injection** (`@AllArgsConstructor` + `final`) in new services; `@Autowired` field only in existing controllers for consistency
+7. **Constructor injection everywhere** — always use `@AllArgsConstructor` + `private final`; never use `@Autowired` field injection

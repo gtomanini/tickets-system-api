@@ -6,7 +6,7 @@ import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
 import com.br.tickets.services.EventsService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class EventsController {
 
-    @Autowired
-    private EventsService eventsService;
+    private final EventsService eventsService;
 
     @GetMapping("/events")
     public ResponseEntity<Page<EventListDTO>> list(
