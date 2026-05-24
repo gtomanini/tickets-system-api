@@ -1,58 +1,58 @@
-Ative e complete o sistema de autenticação JWT que está parcialmente implementado neste projeto.
+Activate and complete the JWT authentication system that is partially implemented in this project.
 
-A infraestrutura JWT já existe em `src/main/java/com/br/tickets/auth/`. O que precisa ser feito:
+The JWT infrastructure already exists in `src/main/java/com/br/tickets/auth/`. What needs to be done:
 
-## Estado atual (verifique antes de começar)
+## Current state (verify before starting)
 
-- `auth/JwtUtil.java` — utilitário JWT
-- `auth/services/JwtService.java` — geração e validação de tokens
-- `auth/services/AuthService.java` — lógica de autenticação
-- `auth/filter/JwtAuthenticationFilter.java` — filtro Spring Security
-- `auth/impl/UserDetailsServiceImpl.java` — integração com Spring Security
-- `auth/config/SecurityConfig.java` — configuração (rotas admin comentadas)
-- `controllers/AuthController.java` — **comentado**, precisa ser descomentado
-- `models/dto/AuthRequest.java` — DTO de login existente
+- `auth/JwtUtil.java` — JWT utility
+- `auth/services/JwtService.java` — token generation and validation
+- `auth/services/AuthService.java` — authentication logic
+- `auth/filter/JwtAuthenticationFilter.java` — Spring Security filter
+- `auth/impl/UserDetailsServiceImpl.java` — Spring Security integration
+- `auth/config/SecurityConfig.java` — configuration (admin routes commented out)
+- `controllers/AuthController.java` — **commented out**, needs to be uncommented
+- `models/dto/AuthRequest.java` — existing login DTO
 
-## O que implementar
+## What to implement
 
-### 1. Descomentar e completar o AuthController
+### 1. Uncomment and complete AuthController
 
-Ative o `AuthController.java` e garanta que ele tem:
-- `POST /auth/login` — recebe `AuthRequest` (email + password), retorna `JwtResponse`
-- `POST /auth/register` — recebe `RegisterRequest`, cria usuário, retorna `JwtResponse`
+Activate `AuthController.java` and ensure it has:
+- `POST /auth/login` — receives `AuthRequest` (email + password), returns `JwtResponse`
+- `POST /auth/register` — receives `RegisterRequest`, creates user, returns `JwtResponse`
 
-Verifique `auth/requests/RegisterRequest.java` para os campos do registro.
+Check `auth/requests/RegisterRequest.java` for the registration fields.
 
-### 2. Completar o AuthService
+### 2. Complete AuthService
 
-Garanta que `AuthService` tem os métodos:
-- `login(AuthRequest)` → valida credenciais via `AuthenticationManager`, gera JWT, retorna `JwtResponse`
-- `register(RegisterRequest)` → cria `User`, hash da senha via `BCryptPasswordEncoder`, salva, retorna JWT
+Ensure `AuthService` has:
+- `login(AuthRequest)` → validates credentials via `AuthenticationManager`, generates JWT, returns `JwtResponse`
+- `register(RegisterRequest)` → creates `User`, hashes password via `BCryptPasswordEncoder`, saves, returns JWT
 
-### 3. Ativar UserRepository
+### 3. Verify UserRepository
 
-Verificar se `UserRepository` tem o método `findByEmail(String email)` — necessário para `UserDetailsServiceImpl`.
+Check that `UserRepository` has `findByEmail(String email)` — required by `UserDetailsServiceImpl`.
 
-### 4. Ativar rotas protegidas no SecurityConfig
+### 4. Activate protected routes in SecurityConfig
 
-Descomentar as linhas:
+Uncomment the lines:
 ```java
 .requestMatchers("/admin/**").hasRole("ADMIN")
 .requestMatchers("/organizer/**").hasRole("ORGANIZER")
 ```
 
-### 5. Criar testes
+### 5. Write tests
 
-Criar `AuthControllerTest.java` cobrindo:
+Create `AuthControllerTest.java` covering:
 - `login_validCredentials_returnsToken()`
 - `login_invalidCredentials_returns401()`
 - `register_newUser_returnsToken()`
 - `register_duplicateEmail_returns400()`
 
-### 6. Testar manualmente
+### 6. Manual smoke test
 
 ```bash
-# Registrar
+# Register
 curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"123456","name":"Test User"}'
@@ -63,12 +63,12 @@ curl -X POST http://localhost:8080/auth/login \
   -d '{"email":"test@test.com","password":"123456"}'
 ```
 
-### 7. Atualizar CLAUDE.md
+### 7. Update CLAUDE.md
 
-Mova os itens de auth de 🔲 para ✅ no Roadmap.
+Move auth items from 🔲 to ✅ in the Roadmap.
 
-## Atenção
+## Important
 
-- Nunca armazenar senha em plaintext — sempre `passwordEncoder.encode(senha)`
-- O `JWT_SECRET` deve vir de variável de ambiente, não hardcoded
-- Verificar se `application.properties` tem `jwt.secret=${JWT_SECRET}` e se `JwtService` lê corretamente
+- Never store passwords in plaintext — always `passwordEncoder.encode(password)`
+- `JWT_SECRET` must come from an environment variable, never hardcoded
+- Verify `application.properties` has `jwt.secret=${JWT_SECRET}` and that `JwtService` reads it correctly

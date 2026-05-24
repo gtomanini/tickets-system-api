@@ -1,53 +1,53 @@
-Implemente um novo endpoint REST completo para o recurso especificado: $ARGUMENTS
+Implement a complete REST endpoint for the specified resource: $ARGUMENTS
 
-Siga exatamente os padrões definidos no CLAUDE.md. Execute as etapas abaixo em ordem:
+Follow the patterns defined in CLAUDE.md exactly. Execute the steps below in order:
 
-## 1. Entenda o escopo
+## 1. Understand the scope
 
-Identifique a partir de `$ARGUMENTS`:
-- Nome do recurso (ex: "categoria de evento", "desconto")
-- Operações desejadas (ex: listar, criar, buscar por ID)
-- Se não especificado, implemente: GET (lista paginada) + GET por ID + POST
+From `$ARGUMENTS`, identify:
+- Resource name (e.g. "event category", "discount")
+- Desired operations (e.g. list, create, find by ID)
+- If not specified, implement: GET (paginated list) + GET by ID + POST
 
-## 2. Verifique o que já existe
+## 2. Check what already exists
 
-- Leia os arquivos do recurso em `models/`, `repositories/`, `services/`, `controllers/`
-- Identifique o que precisa ser criado vs o que já existe
+- Read files for this resource in `models/`, `repositories/`, `services/`, `controllers/`
+- Identify what needs to be created vs what already exists
 
-## 3. Crie os arquivos necessários (nesta ordem)
+## 3. Create the required files (in this order)
 
-### DTO(s) em `models/dto/`
-- `<Recurso>ListDTO` como `record` para respostas de listagem
-- `Create<Recurso>DTO` como `record` para criação
-- Adicionar `@NotBlank`/`@NotNull` nos campos obrigatórios
+### DTO(s) in `models/dto/`
+- `<Resource>ListDTO` as a `record` for list responses
+- `Create<Resource>DTO` as a `record` for creation
+- Add `@NotBlank`/`@NotNull` on required fields
 
-### Repository em `repositories/`
-- Estender `JpaRepository<Entidade, TipoId>`
-- Se houver filtros complexos, estender também `JpaSpecificationExecutor<Entidade>`
+### Repository in `repositories/`
+- Extend `JpaRepository<Entity, IdType>`
+- Also extend `JpaSpecificationExecutor<Entity>` if complex filters are needed
 
-### Service em `services/`
-- Usar `@AllArgsConstructor` + campos `private final`
-- Métodos: `listar(Pageable)`, `buscarPorId(id)`, `criar(dto)`
-- Lançar `RuntimeException("X not found with id: " + id)` quando não encontrar
+### Service in `services/`
+- Use `@AllArgsConstructor` + `private final` fields
+- Methods: `list(Pageable)`, `findById(id)`, `create(dto)`
+- Throw `RuntimeException("X not found with id: " + id)` when entity is not found
 
-### Controller em `controllers/`
+### Controller in `controllers/`
 - `@RestController` + `@RequestMapping("/api")`
-- Paginação com `page`, `size`, `sort` como params opcionais
-- `ResponseEntity<Page<DTO>>` para listagem; `ResponseEntity` com status 201 para criação
+- Pagination with `page`, `size`, `sort` as optional params
+- `ResponseEntity<Page<DTO>>` for list; `ResponseEntity` with status 201 for create
 
-## 4. Crie o teste em `src/test/java/com/br/tickets/controllers/`
+## 4. Create the test in `src/test/java/com/br/tickets/controllers/`
 
-- `<Recurso>ControllerTest.java`
-- Cobrir: listagem sem filtro, listagem com filtro (se houver), criação válida
-- Usar `@ExtendWith(MockitoExtension.class)` + `MockMvcBuilders.standaloneSetup`
-- Nomenclatura: `metodo_cenario_resultado()`
+- `<Resource>ControllerTest.java`
+- Cover: list without filters, list with filter (if applicable), valid creation
+- Use `@ExtendWith(MockitoExtension.class)` + `MockMvcBuilders.standaloneSetup`
+- Method naming: `method_scenario_expectedResult()`
 
-## 5. Atualize o CLAUDE.md
+## 5. Update CLAUDE.md
 
-- Mova o recurso de 🔲 para ✅ no Roadmap (ou adicione-o como ✅ se era novo)
+- Move the resource from 🔲 to ✅ in the Roadmap (or add it as ✅ if it was new)
 
-## 6. Rode os testes
+## 6. Run tests
 
-Execute `./mvnw test` e corrija qualquer falha antes de reportar conclusão.
+Execute `./mvnw test` and fix any failures before reporting completion.
 
-Ao terminar, liste os arquivos criados/modificados e confirme que os testes passaram.
+When done, list the files created/modified and confirm tests passed.

@@ -1,8 +1,8 @@
-Implemente um handler global de exceções para padronizar as respostas de erro da API.
+Implement a global exception handler to standardize API error responses.
 
-## O que criar
+## What to create
 
-### 1. Classe de resposta de erro em `models/dto/`
+### 1. Error response record in `models/dto/`
 
 ```java
 public record ApiErrorDTO(
@@ -17,7 +17,7 @@ public record ApiErrorDTO(
 }
 ```
 
-### 2. Handler global em `controllers/` (ou `controllers/advice/`)
+### 2. Global handler in `controllers/` (or `controllers/advice/`)
 
 ```java
 @RestControllerAdvice
@@ -25,44 +25,44 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorDTO> handleNotFound(RuntimeException ex) {
-        // Mapear "X not found with id: Y" para 404
-        // Outros RuntimeException → 500
+        // Map "X not found with id: Y" to 404
+        // Other RuntimeException → 500
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorDTO> handleValidation(MethodArgumentNotValidException ex) {
-        // Coletar todos os erros de field e retornar mensagem unificada
+        // Collect all field errors and return a unified message
         // Status 400
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleGeneral(Exception ex) {
-        // Status 500 genérico
+        // Generic 500
     }
 }
 ```
 
-### 3. Regras de mapeamento
+### 3. Mapping rules
 
-| Exceção | Status HTTP |
+| Exception | HTTP Status |
 |---|---|
-| `RuntimeException` com "not found" na mensagem | 404 |
+| `RuntimeException` with "not found" in the message | 404 |
 | `MethodArgumentNotValidException` | 400 |
 | `DataIntegrityViolationException` | 409 Conflict |
-| Qualquer outra `Exception` | 500 |
+| Any other `Exception` | 500 |
 
-### 4. Criar teste
+### 4. Write tests
 
-`GlobalExceptionHandlerTest.java` cobrindo:
-- 404 quando service lança RuntimeException com "not found"
-- 400 quando payload inválido (campo obrigatório ausente)
+`GlobalExceptionHandlerTest.java` covering:
+- 404 when service throws RuntimeException with "not found"
+- 400 when payload is invalid (missing required field)
 
-### 5. Atualizar CLAUDE.md
+### 5. Update CLAUDE.md
 
-Após implementar, atualizar a seção "A implementar" no Roadmap.
+After implementing, update the "To implement" section in the Roadmap.
 
-## Atenção
+## Important
 
-- Não logar stack trace completo para o cliente — apenas mensagem
-- Em ambiente de desenvolvimento, pode retornar mais detalhes
-- Verificar que o `SecurityConfig` não está interceptando os 4xx antes de chegar ao handler
+- Never expose the full stack trace to the client — message only
+- In development, more detail may be returned
+- Verify that `SecurityConfig` is not intercepting 4xx responses before they reach the handler
