@@ -9,7 +9,7 @@ This file is the **source of truth** for AI-assisted development. Every new feat
 RESTful API for event management and ticket sales. Organizers create events at venues, define ticket types, and users purchase tickets through orders.
 
 **Stack:** Java 21 · Spring Boot 3.5.x · MySQL 8 · JWT · Docker  
-**Deploy:** Render.com (production) · Docker Compose (local)
+**Deploy:** Docker Compose (local)
 
 ---
 
