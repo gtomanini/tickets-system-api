@@ -4,8 +4,7 @@ import com.br.tickets.models.base.UUIDIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -19,35 +18,20 @@ public class Ticket extends UUIDIdEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private Integer amount;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal netAmount;
-
-    private Integer quantity;
-
     @Column(length = 1000)
     private String obs;
 
-    @Column(name = "sales_ends_at")
-    private LocalDateTime saleEndsAt;
+    @Column(nullable = false)
+    private Integer totalCapacity;
 
+    @Version
+    private Long version;
 
-//    @ManyToOne
-//    @JoinColumn(name = "variant_of")
-//    private Ticket variantOf;
-//
-//    @OneToMany(mappedBy = "variantOf")
-//    private List<Ticket> variants;
-//
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "section_id")
-//    private Section section;
 
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TicketVariant> variants;
 }
 

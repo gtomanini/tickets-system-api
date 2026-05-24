@@ -186,13 +186,16 @@ class ExampleControllerTest {
 ### Implemented ✅
 - `GET /api/events` — paginated listing with name and status filters
 - `POST /api/events` — event creation
-- `GET /api/tickets?eventId=` — tickets by event
+- `GET /api/tickets?eventId=` — tickets with variants by event
+- `GET /api/tickets/{ticketId}/variants` — list variants for a ticket
+- `POST /api/tickets/{ticketId}/variants` — create variant (validates quantity against parent capacity)
 - `GET /api/venues` — venue listing
 - `GET /api/venues/{id}` — venue by ID
 - JWT infrastructure (filter, service, util) — working but endpoints commented out
 - Docker Compose with MySQL + PhpMyAdmin
-- Unit tests for Events, Tickets and Venues
+- Unit tests for Events, Tickets, Venues and TicketVariants
 - UUID v7 via `@UuidGenerator(Style.TIME)` on `UUIDIdEntity`
+- `Ticket` holds `totalCapacity` + `@Version` (optimistic lock for checkout); `TicketVariant` holds per-tier pricing and stock
 
 ### To implement 🔲
 - `POST /auth/register` — user registration (infrastructure ready, uncomment and complete)

@@ -2,9 +2,8 @@ package com.br.tickets.models;
 
 import com.br.tickets.models.base.UUIDIdEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,9 +32,9 @@ public class OrderTicket extends UUIDIdEntity {
     @Column(name = "used_at")
     private LocalDateTime usedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "ticket_id", referencedColumnName = "id")
-    private Ticket ticket;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_variant_id", referencedColumnName = "id")
+    private TicketVariant ticketVariant;
 
     @ManyToOne
     @JoinColumn(name = "seat_id", referencedColumnName = "id")
