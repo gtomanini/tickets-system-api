@@ -16,6 +16,5 @@ public abstract class UUIDIdEntity extends SoftDeletableEntity {
 
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
-    @Column(columnDefinition = "UUID")
     protected UUID id;
 }

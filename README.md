@@ -1,6 +1,6 @@
 # Tickets System API
 
-A RESTful API for event management and ticket sales. Organizers create events at venues, define ticket types, and users purchase tickets through orders.
+A RESTful API for event management and ticket sales. Organizers create events at venues, define ticket types and pricing variants, and users purchase tickets through orders.
 
 ## Tech Stack
 
@@ -34,7 +34,9 @@ A RESTful API for event management and ticket sales. Organizers create events at
 ### Tickets
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/tickets?eventId={id}` | List ticket types for an event |
+| `GET` | `/api/tickets?eventId={id}` | List ticket types with variants for an event |
+| `GET` | `/api/tickets/{ticketId}/variants` | List variants for a ticket |
+| `POST` | `/api/tickets/{ticketId}/variants` | Create a variant for a ticket |
 
 ### Venues
 | Method | Path | Description |
@@ -49,12 +51,13 @@ A RESTful API for event management and ticket sales. Organizers create events at
 
 ---
 
-## Running Locally
+## Local Development
 
 ### Prerequisites
 
 - Java 21+
 - Docker and Docker Compose
+- `make` (optional but recommended)
 
 ### 1. Clone the repository
 
@@ -63,40 +66,71 @@ git clone https://github.com/gtomanini/tickets-system-api.git
 cd tickets-system-api
 ```
 
-### 2. Start the database
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+# .env already has working defaults for local Docker — no changes needed
+```
+
+### 3. Start the database and run the API
+
+```bash
+make dev
+```
+
+This starts MySQL 8 + PhpMyAdmin via Docker Compose, then boots the app with the `dev` profile.
+
+| Service | URL |
+|---|---|
+| API | http://localhost:8080 |
+| PhpMyAdmin | http://localhost:8090 |
+
+> On first startup, `DevDataSeeder` automatically populates the database with venues, events, tickets and variants — ready for manual testing.
+
+### Without `make`
 
 ```bash
 docker compose up -d
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-This starts MySQL 8 on port `3306` and PhpMyAdmin on port `8090`.
+---
 
-### 3. Set environment variables
+## Makefile Commands
 
-```bash
-export DB_URL=jdbc:mysql://localhost:3306/tickets
-export DB_USERNAME=admin
-export DB_PASSWORD=1234
-export JWT_SECRET=your-secret-key
-```
+| Command | Description |
+|---|---|
+| `make dev` | Start DB containers and run the API (dev profile) |
+| `make db-up` | Start MySQL + PhpMyAdmin only |
+| `make db-down` | Stop containers (data is preserved) |
+| `make db-reset` | Destroy data volume and restart with a clean database |
+| `make test` | Run the test suite |
 
-### 4. Run the application
+---
 
-```bash
-./mvnw spring-boot:run
-```
+## Seed Data
 
-The API will be available at `http://localhost:8080`.
+When running with the `dev` profile, the following data is seeded automatically on first startup:
+
+- **States:** SP, RJ, MG, RS
+- **Venues:** Allianz Parque, Maracanã, Mineirão
+- **Events:** Rock in Rio 2025, Lollapalooza Brasil 2025, Clássico Mineiro, Festival de Inverno 2024 (past)
+- **Ticket variants per ticket:** Full Price, Half Price — Student, Half Price — Senior (60+)
+
+To reset and reseed: `make db-reset` followed by `make dev`.
 
 ---
 
 ## Running Tests
 
 ```bash
+make test
+# or
 ./mvnw test
 ```
 
-Tests use an H2 in-memory database and do not require a running MySQL instance.
+Tests use an H2 in-memory database and do not require Docker.
 
 ---
 
@@ -105,6 +139,7 @@ Tests use an H2 in-memory database and do not require a running MySQL instance.
 ```
 src/main/java/com/br/tickets/
 ├── auth/               # JWT filter, Spring Security config, token service
+├── config/             # DevDataSeeder (dev profile only)
 ├── controllers/        # REST controllers
 ├── enums/              # Domain enumerations (UserRole, OrderStatus)
 ├── models/
@@ -129,7 +164,8 @@ All entities support **soft delete** via `@SQLDelete` and are audited with `crea
 - [ ] `POST /auth/register` — user registration
 - [ ] `POST /auth/login` — JWT authentication
 - [ ] `PUT` / `DELETE` for events, tickets and venues
-- [ ] Checkout flow — order creation and ticket issuance
+- [ ] Checkout flow with PIX payment (MercadoPago / PagSeguro)
+- [ ] 20-minute ticket reservation with expiry scheduler
 - [ ] Role-based access control (`ADMIN`, `ORGANIZER`, `USER`)
 - [ ] Global exception handler with standardized error responses
 

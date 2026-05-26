@@ -2,9 +2,14 @@ package com.br.tickets.models;
 
 import com.br.tickets.models.base.AutoIncrementIdEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "cities")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class City extends AutoIncrementIdEntity {
 
     @Column(nullable = false)
