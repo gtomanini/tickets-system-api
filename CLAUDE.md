@@ -197,9 +197,11 @@ class ExampleControllerTest {
 - UUID v7 via `@UuidGenerator(Style.TIME)` on `UUIDIdEntity`
 - `Ticket` holds `totalCapacity` + `@Version` (optimistic lock for checkout); `TicketVariant` holds per-tier pricing and stock
 
+### Implemented ✅ (continued)
+- `POST /auth/register` — user registration, returns JWT, defaults role to USER
+- `POST /auth/login` — JWT login, returns JWT token
+
 ### To implement 🔲
-- `POST /auth/register` — user registration (infrastructure ready, uncomment and complete)
-- `POST /auth/login` — JWT login (uncomment `AuthController`)
 - `GET /admin/events` — admin listing with ADMIN role (uncomment and implement)
 - Checkout flow (`CheckoutController` — stub exists, implement order logic)
 - `PUT` and `DELETE` for events, tickets and venues

@@ -1,11 +1,12 @@
 package com.br.tickets.auth.services;
 
 import com.br.tickets.auth.requests.RegisterRequest;
+import com.br.tickets.enums.UserRole;
 import com.br.tickets.models.User;
 import com.br.tickets.models.dto.AuthRequest;
 import com.br.tickets.models.dto.JwtResponse;
 import com.br.tickets.repositories.UserRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -14,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -22,16 +23,21 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
-    public String register(RegisterRequest request) {
-        var user = User.builder()
+    public JwtResponse register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new RuntimeException("Email already in use: " + request.email());
+        }
+
+        User user = User.builder()
                 .name(request.name())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
+                .role(UserRole.USER)
                 .build();
 
         userRepository.save(user);
 
-        return jwtService.generateToken(user);
+        return new JwtResponse(jwtService.generateToken(user));
     }
 
     public JwtResponse authenticate(AuthRequest request) {
@@ -40,25 +46,12 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Credenciais inválidas");
+            throw new RuntimeException("Invalid credentials");
         }
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        String jwtToken = jwtService.generateToken(user);
-
-        return new JwtResponse(jwtToken);
-    }
-
-    public String login(AuthRequest request) {
-        var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
-        authenticationManager.authenticate(authToken);
-
-        var user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return jwtService.generateToken(user);
+        return new JwtResponse(jwtService.generateToken(user));
     }
 }
-
