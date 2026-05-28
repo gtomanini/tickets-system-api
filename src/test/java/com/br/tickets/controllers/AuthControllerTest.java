@@ -21,6 +21,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.br.tickets.controllers.advice.GlobalExceptionHandler;
+import org.mockito.Mockito;
+import org.springframework.security.authentication.BadCredentialsException;
+
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
@@ -36,7 +40,10 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(authController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
@@ -53,7 +60,33 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token").value("mocked.jwt.token"));
     }
 
-    // Error-status tests (401, 409) require GlobalExceptionHandler — see /add-exception-handler.
+    @Test
+    void login_badCredentials_returns401() throws Exception {
+        AuthRequest request = new AuthRequest("user@test.com", "wrongpassword");
+
+        Mockito.when(authService.authenticate(any(AuthRequest.class)))
+                .thenThrow(new BadCredentialsException("Bad credentials"));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    void register_duplicateEmail_returns409() throws Exception {
+        RegisterRequest request = new RegisterRequest("Jane Doe", "jane@test.com", "password123");
+
+        Mockito.when(authService.register(any(RegisterRequest.class)))
+                .thenThrow(new RuntimeException("Email already in use: jane@test.com"));
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+    }
 
     @Test
     void register_newUser_returnsCreatedWithToken() throws Exception {

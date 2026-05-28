@@ -102,7 +102,7 @@ public class ExampleController {
 ### Services
 - Use `@AllArgsConstructor` (Lombok) + `private final` for constructor injection (preferred in new services)
 - Filtered searches → use `Specification<T>` via `JpaSpecificationExecutor`
-- Throw `RuntimeException` with a descriptive message when entity is not found (until custom exceptions are implemented)
+- Throw `RuntimeException` with a descriptive message when entity is not found — `GlobalExceptionHandler` maps messages containing "not found" → 404, "already in use / already exists" → 409, "invalid credentials / credenciais" → 401, all others → 500
 
 ```java
 @Service
@@ -200,13 +200,14 @@ class ExampleControllerTest {
 ### Implemented ✅ (continued)
 - `POST /auth/register` — user registration, returns JWT, defaults role to USER
 - `POST /auth/login` — JWT login, returns JWT token
+- `GlobalExceptionHandler` (`@RestControllerAdvice`) — standardised JSON error responses: 404 (not found), 400 (validation / illegal arg), 401 (bad credentials), 409 (conflict / data integrity), 500 (catch-all)
+- `spring-boot-starter-validation` — Hibernate Validator wired; `@Valid` active on all controllers
+- Unit tests for `GlobalExceptionHandler` (10 cases) and updated `AuthControllerTest` with 401/409 error paths
 
 ### To implement 🔲
 - `GET /admin/events` — admin listing with ADMIN role (uncomment and implement)
 - Checkout flow (`CheckoutController` — stub exists, implement order logic)
 - `PUT` and `DELETE` for events, tickets and venues
-- Input validation with `@Valid` in controllers (jakarta.validation already on classpath)
-- Custom exceptions with `@ControllerAdvice` to standardize 4xx/5xx responses
 
 ---
 
