@@ -8,9 +8,9 @@ import com.br.tickets.services.EventsService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,26 +23,9 @@ public class EventsController {
 
     @GetMapping("/events")
     public ResponseEntity<Page<EventListDTO>> list(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name,desc") String sort) {
-                
-        EventSearchCriteria criteria = new EventSearchCriteria();
-        criteria.setName(name);
-        criteria.setStatus(status);
-
-        String[] sortParams = sort.split(",");
-        String property = sortParams[0];
-        Sort.Direction direction = Sort.Direction.ASC;
-        if (sortParams.length > 1 && sortParams[1].equalsIgnoreCase("DESC")) {
-            direction = Sort.Direction.DESC;
-        }
-
-        Sort sorting = Sort.by(direction, property);
-        Pageable pageable = PageRequest.of(page, size, sorting);
-            return ResponseEntity.ok(this.eventsService.searchEvents(criteria, pageable));
+            @ModelAttribute EventSearchCriteria criteria,
+            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(eventsService.searchEvents(criteria, pageable));
     }
 
     @PostMapping("/events")

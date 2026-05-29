@@ -1,13 +1,9 @@
 package com.br.tickets.models.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+public record EventSearchCriteria(String name, String status) {
 
-@Data
-@Getter
-@Setter
-public class EventSearchCriteria {
-    private String name;
-    private String status;
+    // Convenience no-arg equivalent — used when no filter params are sent
+    public EventSearchCriteria() {
+        this(null, null);
+    }
 }
