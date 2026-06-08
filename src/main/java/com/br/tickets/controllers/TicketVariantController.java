@@ -3,6 +3,8 @@ package com.br.tickets.controllers;
 import com.br.tickets.models.dto.CreateTicketVariantDTO;
 import com.br.tickets.models.dto.TicketVariantListDTO;
 import com.br.tickets.services.TicketVariantService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Ticket Variants")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor

@@ -4,6 +4,7 @@ import com.br.tickets.auth.requests.RegisterRequest;
 import com.br.tickets.auth.services.AuthService;
 import com.br.tickets.models.dto.AuthRequest;
 import com.br.tickets.models.dto.JwtResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Auth", description = "Registration and login — returns a JWT for use in authenticated requests")
 @RestController
 @RequestMapping("/auth")
 @AllArgsConstructor
