@@ -85,15 +85,13 @@ jobs:
             cd ~/tickets-system-api
             git pull
 
-            # ── Create .env from GitHub secrets if not present ────────────
-            if [ ! -f .env ]; then
-              cat > .env << 'ENVEOF'
+            # ── Write .env from GitHub secrets (always up to date) ──────
+            cat > .env << 'ENVEOF'
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             ENVEOF
-            fi
 
             # ── Deploy ────────────────────────────────────────────────────
             sudo docker compose -f docker-compose.prod.yaml pull
