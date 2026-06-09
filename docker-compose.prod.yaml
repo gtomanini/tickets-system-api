@@ -1,16 +1,49 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-tickets
+    restart: always
+    environment:
+      MYSQL_DATABASE: tickets
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # Memory-tuned for 1 GB RAM — MySQL stays under ~200 MB
+    command:
+      - --innodb-buffer-pool-size=128M
+      - --max-connections=50
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - tickets-network
+
   api:
     image: ghcr.io/gtomanini/tickets-system-api:latest
     container_name: api-tickets
     restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
-      # DB_URL points to the private IP of the MySQL VM
-      # e.g. jdbc:mysql://10.0.0.x:3306/tickets
-      DB_URL: ${DB_URL}
+      DB_URL: jdbc:mysql://mysql:3306/tickets
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      # Memory-tuned for 1 GB RAM (AMD micro VM)
+      # JVM capped at 384 MB — leaves headroom for MySQL + OS on 1 GB VM
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m"
+    networks:
+      - tickets-network
+
+volumes:
+  mysql-data:
+
+networks:
+  tickets-network:
