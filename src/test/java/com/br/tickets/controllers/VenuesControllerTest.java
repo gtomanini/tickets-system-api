@@ -1,32 +1,31 @@
 package com.br.tickets.controllers;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-import java.util.List;
-
+import com.br.tickets.controllers.advice.GlobalExceptionHandler;
+import com.br.tickets.models.dto.CreateVenueDTO;
+import com.br.tickets.models.dto.VenueListDTO;
+import com.br.tickets.services.VenuesService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import com.br.tickets.config.TestSecurityConfig;
-import com.br.tickets.models.Venue;
-import com.br.tickets.models.dto.VenueListDTO;
-import com.br.tickets.repositories.VenuesRepository;
-import com.br.tickets.services.VenuesService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@Import(TestSecurityConfig.class)
 public class VenuesControllerTest {
 
     private MockMvc mockMvc;
@@ -34,34 +33,69 @@ public class VenuesControllerTest {
     @Mock
     private VenuesService venuesService;
 
-    @Mock
-    private VenuesRepository venuesRepository;
-
     @InjectMocks
     private VenuesController venuesController;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(venuesController).build();
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(venuesController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setValidator(validator)
+                .build();
     }
 
     @Test
-    void list_allVenues() throws Exception {
+    void list_allVenues_returnsOk() throws Exception {
+        VenueListDTO v1 = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo");
+        VenueListDTO v2 = new VenueListDTO(2L, "Maracanã", "Estádio RJ", "Av. Presidente Castelo Branco", -43.23, -22.91, null, null, 2L, "Rio de Janeiro");
 
-        VenueListDTO venueListDTO1 = new VenueListDTO(1L, "Venue One", "First Venue", "123 Main St", -46.625290, -23.533773, "http://example.com/venue1", "http://example.com/photo1.jpg", null);
-        VenueListDTO venueListDTO2 = new VenueListDTO(2L, "Venue Two", "Second Venue", "456 Elm St", -46.625290, -23.533773, "http://example.com/venue2", "http://example.com/photo2.jpg", null);
+        when(venuesService.getAllVenues()).thenReturn(List.of(v1, v2));
 
-        when(venuesService.getAllVenues()).thenReturn(List.of(
-            venueListDTO1, venueListDTO2
-        ));       
-
-        mockMvc.perform(get("/api/venues")
-            .contentType(MediaType.APPLICATION_JSON) 
-            .content(this.objectMapper.writeValueAsString(Venue.class)))
-            .andExpect(status().isOk());
-
+        mockMvc.perform(get("/api/venues"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Allianz Parque"))
+                .andExpect(jsonPath("$[1].name").value("Maracanã"));
     }
-   
+
+    @Test
+    void create_validPayload_returnsCreated() throws Exception {
+        CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque", 1L, "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null);
+        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo");
+
+        when(venuesService.createVenue(any(CreateVenueDTO.class))).thenReturn(response);
+
+        mockMvc.perform(post("/api/venues")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Allianz Parque"))
+                .andExpect(jsonPath("$.cityName").value("São Paulo"));
+    }
+
+    @Test
+    void create_missingName_returnsBadRequest() throws Exception {
+        CreateVenueDTO dto = new CreateVenueDTO("", 1L, null, null, null, null, null, null);
+
+        mockMvc.perform(post("/api/venues")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void create_missingCityId_returnsBadRequest() throws Exception {
+        CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque", null, null, null, null, null, null, null);
+
+        mockMvc.perform(post("/api/venues")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
 }
