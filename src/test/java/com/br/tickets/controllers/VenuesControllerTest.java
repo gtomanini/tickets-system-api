@@ -19,9 +19,11 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,5 +99,32 @@ public class VenuesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void update_validPayload_returnsOk() throws Exception {
+        CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque Updated", 1L, "Updated desc", null, null, null, null, null);
+        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque Updated", "Updated desc", null, null, null, null, null, 1L, "São Paulo");
+
+        when(venuesService.updateVenue(eq(1L), any(CreateVenueDTO.class))).thenReturn(response);
+
+        mockMvc.perform(put("/api/venues/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Allianz Parque Updated"));
+    }
+
+    @Test
+    void update_notFound_returns404() throws Exception {
+        CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque", 1L, null, null, null, null, null, null);
+
+        when(venuesService.updateVenue(eq(99L), any(CreateVenueDTO.class)))
+                .thenThrow(new RuntimeException("Venue not found with id: 99"));
+
+        mockMvc.perform(put("/api/venues/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
     }
 }

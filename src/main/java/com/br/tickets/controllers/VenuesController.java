@@ -36,4 +36,9 @@ public class VenuesController {
     public ResponseEntity<VenueListDTO> create(@RequestBody @Valid CreateVenueDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(venuesService.createVenue(dto));
     }
+
+    @PutMapping("/venues/{id}")
+    public ResponseEntity<VenueListDTO> update(@PathVariable Long id, @RequestBody @Valid CreateVenueDTO dto) {
+        return ResponseEntity.ok(venuesService.updateVenue(id, dto));
+    }
 }

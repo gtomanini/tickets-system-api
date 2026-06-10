@@ -30,6 +30,25 @@ public class VenuesService {
         return toDTO(venue);
     }
 
+    public VenueListDTO updateVenue(Long id, CreateVenueDTO dto) {
+        Venue venue = venuesRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Venue not found with id: " + id));
+
+        City city = cityRepository.findById(dto.cityId())
+                .orElseThrow(() -> new RuntimeException("City not found with id: " + dto.cityId()));
+
+        venue.setName(dto.name());
+        venue.setDescription(dto.description());
+        venue.setAddress(dto.address());
+        venue.setLongitude(dto.longitude());
+        venue.setLatitude(dto.latitude());
+        venue.setPlant_url(dto.plantUrl());
+        venue.setPhotos(dto.photos());
+        venue.setCity(city);
+
+        return toDTO(venuesRepository.save(venue));
+    }
+
     public VenueListDTO createVenue(CreateVenueDTO dto) {
         City city = cityRepository.findById(dto.cityId())
                 .orElseThrow(() -> new RuntimeException("City not found with id: " + dto.cityId()));
