@@ -4,6 +4,7 @@ import com.br.tickets.models.Venue;
 import com.br.tickets.models.dto.CreateEventDTO;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
+import com.br.tickets.models.dto.SectionListDTO;
 import com.br.tickets.models.dto.VenueListDTO;
 import com.br.tickets.repositories.EventsRepository;
 import com.br.tickets.models.Event;
@@ -68,6 +69,11 @@ public class EventsService {
         Long cityId = venue.getCity() != null ? venue.getCity().getId() : null;
         String cityName = venue.getCity() != null ? venue.getCity().getName() : null;
         Long stateId = venue.getCity() != null ? venue.getCity().getState().getId() : null;
+        List<SectionListDTO> sections = venue.getSections() != null
+                ? venue.getSections().stream()
+                        .map(s -> new SectionListDTO(s.getId(), s.getName(), s.getCapacity(), s.getNumbered()))
+                        .toList()
+                : List.of();
         return new VenueListDTO(
                 venue.getId(),
                 venue.getName(),
@@ -79,7 +85,8 @@ public class EventsService {
                 venue.getPhotos(),
                 cityId,
                 cityName,
-                stateId
+                stateId,
+                sections
         );
     }
 

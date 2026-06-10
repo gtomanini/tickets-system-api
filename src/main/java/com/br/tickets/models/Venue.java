@@ -4,6 +4,8 @@ import com.br.tickets.models.base.AutoIncrementIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "venues")
 @NoArgsConstructor
@@ -34,8 +36,8 @@ public class Venue extends AutoIncrementIdEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
     private City city;
-//
-//    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)
-//    private List<SectorEntity> sectors;
+
+    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Section> sections;
 }
 

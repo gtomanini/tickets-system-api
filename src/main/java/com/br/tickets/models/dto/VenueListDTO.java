@@ -1,5 +1,7 @@
 package com.br.tickets.models.dto;
 
+import java.util.List;
+
 public record VenueListDTO(
         Long id,
         String name,
@@ -11,5 +13,6 @@ public record VenueListDTO(
         String photos,
         Long cityId,
         String cityName,
-        Long stateId
+        Long stateId,
+        List<SectionListDTO> sections
 ) {}

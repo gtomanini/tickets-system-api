@@ -4,26 +4,26 @@ import com.br.tickets.models.base.AutoIncrementIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Entity
 @Table(name = "sections")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class Section extends AutoIncrementIdEntity {
 
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private Integer capacity;
 
-    private Boolean isNumbered;
+    @Column(nullable = false)
+    private Boolean numbered;
 
-    @Column(name = "place_id", insertable = false, updatable = false)
-    private Long placeId;
-
-    @ManyToOne
-    @JoinColumn(name = "place_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
 //    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)

@@ -203,11 +203,20 @@ class ExampleControllerTest {
 - `GlobalExceptionHandler` (`@RestControllerAdvice`) — standardised JSON error responses: 404 (not found), 400 (validation / illegal arg), 401 (bad credentials), 409 (conflict / data integrity), 500 (catch-all)
 - `spring-boot-starter-validation` — Hibernate Validator wired; `@Valid` active on all controllers
 - Unit tests for `GlobalExceptionHandler` (10 cases) and updated `AuthControllerTest` with 401/409 error paths
+- `POST /api/venues` — create venue (`name` + `cityId` required)
+- `PUT /api/venues/{id}` — update venue (reuses `CreateVenueDTO`)
+- `GET/POST/PUT /api/venues/{venueId}/sections` — section management per venue
+- `GET /api/states` — list all Brazilian states
+- `GET /api/cities?stateId={id}&name={name}` — paginated city search
+- `GeoDataInitializer` — seeds Country + 27 states + ~5570 cities from IBGE API on first startup
+- `Country → State → City` entity hierarchy with clean FK relationships
+- `VenueListDTO` and `EventListDTO` expose proper DTOs (no JPA entities in responses)
 
 ### To implement 🔲
 - `GET /admin/events` — admin listing with ADMIN role (uncomment and implement)
 - Checkout flow (`CheckoutController` — stub exists, implement order logic)
-- `PUT` and `DELETE` for events, tickets and venues
+- `PUT` / `DELETE` for events and tickets
+- `DELETE` for venues and sections
 
 ---
 

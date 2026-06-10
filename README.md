@@ -72,6 +72,21 @@ All subsequent requests will include `Authorization: Bearer <token>` automatical
 |---|---|---|---|
 | `GET` | `/api/venues` | ✓ | List all venues |
 | `GET` | `/api/venues/{id}` | ✓ | Get venue by ID |
+| `POST` | `/api/venues` | ✓ | Create a venue (`name` + `cityId` required) |
+| `PUT` | `/api/venues/{id}` | ✓ | Update a venue |
+
+### Sections
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/venues/{venueId}/sections` | ✓ | List sections for a venue |
+| `POST` | `/api/venues/{venueId}/sections` | ✓ | Add a section to a venue |
+| `PUT` | `/api/venues/{venueId}/sections/{sectionId}` | ✓ | Update a section |
+
+### Geography
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/states` | ✓ | List all Brazilian states |
+| `GET` | `/api/cities` | ✓ | Paginated city search (`stateId`, `name` optional) |
 
 ### Observability
 | Method | Path | Description |
