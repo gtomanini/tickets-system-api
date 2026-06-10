@@ -54,8 +54,8 @@ public class VenuesControllerTest {
 
     @Test
     void list_allVenues_returnsOk() throws Exception {
-        VenueListDTO v1 = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo");
-        VenueListDTO v2 = new VenueListDTO(2L, "Maracanã", "Estádio RJ", "Av. Presidente Castelo Branco", -43.23, -22.91, null, null, 2L, "Rio de Janeiro");
+        VenueListDTO v1 = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo", 35L);
+        VenueListDTO v2 = new VenueListDTO(2L, "Maracanã", "Estádio RJ", "Av. Presidente Castelo Branco", -43.23, -22.91, null, null, 2L, "Rio de Janeiro", 19L);
 
         when(venuesService.getAllVenues()).thenReturn(List.of(v1, v2));
 
@@ -68,7 +68,7 @@ public class VenuesControllerTest {
     @Test
     void create_validPayload_returnsCreated() throws Exception {
         CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque", 1L, "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null);
-        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo");
+        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque", "Arena SP", "Av. Francisco Matarazzo", -46.68, -23.52, null, null, 1L, "São Paulo", 35L);
 
         when(venuesService.createVenue(any(CreateVenueDTO.class))).thenReturn(response);
 
@@ -104,7 +104,7 @@ public class VenuesControllerTest {
     @Test
     void update_validPayload_returnsOk() throws Exception {
         CreateVenueDTO dto = new CreateVenueDTO("Allianz Parque Updated", 1L, "Updated desc", null, null, null, null, null);
-        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque Updated", "Updated desc", null, null, null, null, null, 1L, "São Paulo");
+        VenueListDTO response = new VenueListDTO(1L, "Allianz Parque Updated", "Updated desc", null, null, null, null, null, 1L, "São Paulo", 35L);
 
         when(venuesService.updateVenue(eq(1L), any(CreateVenueDTO.class))).thenReturn(response);
 

@@ -10,5 +10,6 @@ public record VenueListDTO(
         String plantUrl,
         String photos,
         Long cityId,
-        String cityName
+        String cityName,
+        Long stateId
 ) {}

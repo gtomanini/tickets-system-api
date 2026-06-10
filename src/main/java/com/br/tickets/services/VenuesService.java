@@ -70,6 +70,7 @@ public class VenuesService {
     private VenueListDTO toDTO(Venue venue) {
         Long cityId = venue.getCity() != null ? venue.getCity().getId() : null;
         String cityName = venue.getCity() != null ? venue.getCity().getName() : null;
+        Long stateId = venue.getCity() != null ? venue.getCity().getState().getId() : null;
         return new VenueListDTO(
                 venue.getId(),
                 venue.getName(),
@@ -80,7 +81,8 @@ public class VenuesService {
                 venue.getPlant_url(),
                 venue.getPhotos(),
                 cityId,
-                cityName
+                cityName,
+                stateId
         );
     }
 }
