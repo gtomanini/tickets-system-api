@@ -1,8 +1,10 @@
 package com.br.tickets.services;
 
+import com.br.tickets.models.Venue;
 import com.br.tickets.models.dto.CreateEventDTO;
 import com.br.tickets.models.dto.EventListDTO;
 import com.br.tickets.models.dto.EventSearchCriteria;
+import com.br.tickets.models.dto.VenueListDTO;
 import com.br.tickets.repositories.EventsRepository;
 import com.br.tickets.models.Event;
 
@@ -42,7 +44,7 @@ public class EventsService {
                 event.getDescription(),
                 event.getStartDate(),
                 event.getEndDate(),
-                event.getVenue(),
+                toVenueDTO(event.getVenue()),
                 event.getFeatured(),
                 event.getClosed()
         ));
@@ -59,6 +61,26 @@ public class EventsService {
                 .build();
 
         return eventsRepository.save(event);
+    }
+
+    private VenueListDTO toVenueDTO(Venue venue) {
+        if (venue == null) return null;
+        Long cityId = venue.getCity() != null ? venue.getCity().getId() : null;
+        String cityName = venue.getCity() != null ? venue.getCity().getName() : null;
+        Long stateId = venue.getCity() != null ? venue.getCity().getState().getId() : null;
+        return new VenueListDTO(
+                venue.getId(),
+                venue.getName(),
+                venue.getDescription(),
+                venue.getAddress(),
+                venue.getLongitude(),
+                venue.getLatitude(),
+                venue.getPlant_url(),
+                venue.getPhotos(),
+                cityId,
+                cityName,
+                stateId
+        );
     }
 
     private void addNamePredicate(CriteriaBuilder cb, Root<Event> root, List<Predicate> predicates, EventSearchCriteria criteria) {

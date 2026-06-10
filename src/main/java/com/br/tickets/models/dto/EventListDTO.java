@@ -2,8 +2,6 @@ package com.br.tickets.models.dto;
 
 import java.time.LocalDateTime;
 
-import com.br.tickets.models.Venue;
-
 public record EventListDTO(
     Long id,
     String name,
@@ -11,7 +9,7 @@ public record EventListDTO(
     String description,
     LocalDateTime startDate,
     LocalDateTime endDate,
-    Venue venue,
+    VenueListDTO venue,
     Boolean featured,
     Boolean closed
 ){}
