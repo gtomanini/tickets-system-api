@@ -31,8 +31,8 @@ public class Venue extends AutoIncrementIdEntity {
     @Column(columnDefinition = "TEXT")
     private String photos;
 
-    @ManyToOne
-    @JoinColumn(name = "city_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
     private City city;
 //
 //    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL)

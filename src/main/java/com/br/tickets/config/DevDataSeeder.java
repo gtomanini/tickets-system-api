@@ -1,12 +1,18 @@
 package com.br.tickets.config;
 
 import com.br.tickets.models.*;
-import com.br.tickets.repositories.*;
+import com.br.tickets.repositories.AgeRatingRepository;
+import com.br.tickets.repositories.EventCategoryRepository;
+import com.br.tickets.repositories.EventsRepository;
+import com.br.tickets.repositories.TicketVariantRepository;
+import com.br.tickets.repositories.TicketsRepository;
+import com.br.tickets.repositories.VenuesRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +28,10 @@ import java.util.List;
 @Slf4j
 @Component
 @Profile("dev")
+@Order(2)
 @AllArgsConstructor
 public class DevDataSeeder implements ApplicationRunner {
 
-    private final StateRepository stateRepository;
-    private final CityRepository cityRepository;
     private final AgeRatingRepository ageRatingRepository;
     private final EventCategoryRepository eventCategoryRepository;
     private final VenuesRepository venuesRepository;
@@ -37,37 +42,18 @@ public class DevDataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (stateRepository.count() > 0) {
+        if (ageRatingRepository.count() > 0) {
             log.info("[DevDataSeeder] Database already seeded — skipping.");
             return;
         }
 
         log.info("[DevDataSeeder] Seeding dev database...");
 
-        seedStatesAndCities();
         seedAgeRatings();
         seedEventCategories();
         seedVenuesAndEvents();
 
         log.info("[DevDataSeeder] Done.");
-    }
-
-    private void seedStatesAndCities() {
-        State sp = stateRepository.save(State.builder().name("São Paulo").abbr("SP").build());
-        State rj = stateRepository.save(State.builder().name("Rio de Janeiro").abbr("RJ").build());
-        State mg = stateRepository.save(State.builder().name("Minas Gerais").abbr("MG").build());
-        State rs = stateRepository.save(State.builder().name("Rio Grande do Sul").abbr("RS").build());
-
-        cityRepository.saveAll(List.of(
-                buildCity("São Paulo", "SP", sp),
-                buildCity("Campinas", "SP", sp),
-                buildCity("Rio de Janeiro", "RJ", rj),
-                buildCity("Niterói", "RJ", rj),
-                buildCity("Belo Horizonte", "MG", mg),
-                buildCity("Porto Alegre", "RS", rs)
-        ));
-
-        log.info("[DevDataSeeder] States and cities seeded.");
     }
 
     private void seedAgeRatings() {
@@ -234,14 +220,6 @@ public class DevDataSeeder implements ApplicationRunner {
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private record TicketSeed(String name, String obs, int capacity, double price) {}
-
-    private City buildCity(String name, String stateAbbr, State state) {
-        City city = new City();
-        city.setName(name);
-        city.setStateAbbr(stateAbbr);
-        city.setState(state);
-        return city;
-    }
 
     private AgeRating buildAgeRating(String name, String description) {
         AgeRating r = new AgeRating();

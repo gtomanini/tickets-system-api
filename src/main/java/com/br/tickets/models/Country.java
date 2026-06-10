@@ -5,21 +5,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "cities")
+@Table(name = "countries")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class City extends AutoIncrementIdEntity {
+public class Country extends AutoIncrementIdEntity {
 
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "ibge_code")
-    private String ibgeCode;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "state_id", nullable = false)
-    private State state;
+    @Column(nullable = false, length = 2, unique = true)
+    private String code; // ISO 3166-1 alpha-2 (e.g. "BR")
 }
