@@ -1,7 +1,6 @@
 package com.br.tickets.config;
 
 import com.br.tickets.models.*;
-import com.br.tickets.repositories.AgeRatingRepository;
 import com.br.tickets.repositories.EventCategoryRepository;
 import com.br.tickets.repositories.EventsRepository;
 import com.br.tickets.repositories.TicketVariantRepository;
@@ -32,7 +31,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DevDataSeeder implements ApplicationRunner {
 
-    private final AgeRatingRepository ageRatingRepository;
     private final EventCategoryRepository eventCategoryRepository;
     private final VenuesRepository venuesRepository;
     private final EventsRepository eventsRepository;
@@ -42,30 +40,17 @@ public class DevDataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (ageRatingRepository.count() > 0) {
+        if (eventCategoryRepository.count() > 0) {
             log.info("[DevDataSeeder] Database already seeded — skipping.");
             return;
         }
 
         log.info("[DevDataSeeder] Seeding dev database...");
 
-        seedAgeRatings();
         seedEventCategories();
         seedVenuesAndEvents();
 
         log.info("[DevDataSeeder] Done.");
-    }
-
-    private void seedAgeRatings() {
-        ageRatingRepository.saveAll(List.of(
-                buildAgeRating("Livre", "Suitable for all ages"),
-                buildAgeRating("10+", "Not recommended for children under 10"),
-                buildAgeRating("12+", "Not recommended for children under 12"),
-                buildAgeRating("14+", "Not recommended for children under 14"),
-                buildAgeRating("16+", "Not recommended for children under 16"),
-                buildAgeRating("18+", "Not recommended for minors")
-        ));
-        log.info("[DevDataSeeder] Age ratings seeded.");
     }
 
     private void seedEventCategories() {
@@ -220,11 +205,4 @@ public class DevDataSeeder implements ApplicationRunner {
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private record TicketSeed(String name, String obs, int capacity, double price) {}
-
-    private AgeRating buildAgeRating(String name, String description) {
-        AgeRating r = new AgeRating();
-        r.setName(name);
-        r.setDescription(description);
-        return r;
-    }
 }

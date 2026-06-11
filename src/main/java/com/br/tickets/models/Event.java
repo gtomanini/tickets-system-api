@@ -1,13 +1,12 @@
 package com.br.tickets.models;
 
+import com.br.tickets.enums.AgeRating;
 import com.br.tickets.models.base.AutoIncrementIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.hibernate.annotations.Fetch;
 
 @Entity
 @Table(name = "events")
@@ -31,13 +30,15 @@ public class Event extends AutoIncrementIdEntity {
     private Boolean featured;
     private Boolean closed;
 
-    @Column(name = "tag_id", insertable = false, updatable = false)
-    private Long tagId;
+    @Enumerated(EnumType.STRING)
+    private AgeRating ageRating;
 
-    @Column(name = "age_rating_id", insertable = false, updatable = false)
-    private Long ageRatingId;
+    @ElementCollection
+    @CollectionTable(name = "event_tags", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "tag")
+    private List<String> tags;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "event_category",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -45,51 +46,17 @@ public class Event extends AutoIncrementIdEntity {
     )
     private List<EventCategory> categories;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id")
     private Venue venue;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id")
     private Organizer organizer;
 
-
-    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     private List<Ticket> tickets;
-
-//    @ManyToMany
-//    @JoinTable(
-//            name = "event_seats",
-//            joinColumns = @JoinColumn(name = "event_id"),
-//            inverseJoinColumns = @JoinColumn(name = "seat_id")
-//    )
-//    private List<Seat> seats;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Order> orders;
-//
-//    @OneToOne
-//    @JoinColumn(name = "tag_id", referencedColumnName = "id")
-//    private EventTagEntity tag;
-//
-//    @ManyToMany
-//    @JoinTable(
-//            name = "event_service",
-//            joinColumns = @JoinColumn(name = "event_id"),
-//            inverseJoinColumns = @JoinColumn(name = "service_id")
-//    )
-//    private List<Service> services;
-//
-//    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-//    private List<DiscountEntity> discounts;
-//
-   @OneToOne
-   @JoinColumn(name = "age_rating_id", referencedColumnName = "id")
-   private AgeRating ageRating;
-//
-//    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-//    private List<EventTransferEntity> transfers;
-//
-
 }
-
