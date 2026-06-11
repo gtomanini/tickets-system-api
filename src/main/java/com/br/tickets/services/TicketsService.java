@@ -1,8 +1,13 @@
 package com.br.tickets.services;
 
+import com.br.tickets.models.Event;
+import com.br.tickets.models.Section;
 import com.br.tickets.models.Ticket;
+import com.br.tickets.models.dto.CreateTicketDTO;
 import com.br.tickets.models.dto.TicketListDTO;
 import com.br.tickets.models.dto.TicketVariantListDTO;
+import com.br.tickets.repositories.EventsRepository;
+import com.br.tickets.repositories.SectionRepository;
 import com.br.tickets.repositories.TicketsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,15 +19,37 @@ import java.util.List;
 public class TicketsService {
 
     private final TicketsRepository ticketsRepository;
+    private final EventsRepository eventsRepository;
+    private final SectionRepository sectionRepository;
 
     public List<TicketListDTO> getTicketsByEventId(Long eventId) {
-        return ticketsRepository.findByEventId(eventId)
-                .stream()
+        return ticketsRepository.findByEventId(eventId).stream()
                 .map(this::toDTO)
                 .toList();
     }
 
+    public TicketListDTO createTicket(Long eventId, CreateTicketDTO dto) {
+        Event event = eventsRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+        Section section = sectionRepository.findById(dto.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found with id: " + dto.sectionId()));
+
+        Ticket ticket = Ticket.builder()
+                .name(dto.name())
+                .obs(dto.obs())
+                .totalCapacity(dto.totalCapacity())
+                .event(event)
+                .section(section)
+                .build();
+
+        return toDTO(ticketsRepository.save(ticket));
+    }
+
     private TicketListDTO toDTO(Ticket ticket) {
+        Long sectionId = ticket.getSection() != null ? ticket.getSection().getId() : null;
+        String sectionName = ticket.getSection() != null ? ticket.getSection().getName() : null;
+
         List<TicketVariantListDTO> variants = ticket.getVariants() == null ? List.of() :
                 ticket.getVariants().stream()
                         .map(v -> new TicketVariantListDTO(
@@ -41,6 +68,8 @@ public class TicketsService {
                 ticket.getName(),
                 ticket.getObs(),
                 ticket.getTotalCapacity(),
+                sectionId,
+                sectionName,
                 variants
         );
     }
