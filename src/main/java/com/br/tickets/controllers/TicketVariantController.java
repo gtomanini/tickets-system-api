@@ -35,4 +35,12 @@ public class TicketVariantController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ticketVariantService.create(ticketId, dto));
     }
+
+    @PutMapping("/tickets/{ticketId}/variants/{variantId}")
+    public ResponseEntity<TicketVariantListDTO> update(
+            @PathVariable UUID ticketId,
+            @PathVariable UUID variantId,
+            @RequestBody @Valid CreateTicketVariantDTO dto) {
+        return ResponseEntity.ok(ticketVariantService.update(ticketId, variantId, dto));
+    }
 }

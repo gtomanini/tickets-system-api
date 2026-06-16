@@ -28,6 +28,26 @@ public class TicketVariantService {
     }
 
     @Transactional
+    public TicketVariantListDTO update(UUID ticketId, UUID variantId, CreateTicketVariantDTO dto) {
+        Ticket ticket = ticketsRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+
+        TicketVariant variant = ticketVariantRepository.findById(variantId)
+                .orElseThrow(() -> new RuntimeException("Ticket variant not found with id: " + variantId));
+
+        validateQuantityForUpdate(ticket, variant, dto.quantity());
+
+        variant.setName(dto.name());
+        variant.setAmount(dto.amount());
+        variant.setQuantity(dto.quantity());
+        variant.setObs(dto.obs());
+        variant.setSaleEndsAt(dto.saleEndsAt());
+        variant.setRequiresDocument(dto.requiresDocument() != null ? dto.requiresDocument() : false);
+
+        return toDTO(ticketVariantRepository.save(variant));
+    }
+
+    @Transactional
     public TicketVariantListDTO create(UUID ticketId, CreateTicketVariantDTO dto) {
         Ticket ticket = ticketsRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
@@ -60,6 +80,27 @@ public class TicketVariantService {
         int currentAllocated = ticketVariantRepository.sumQuantityByTicketId(ticket.getId());
         if (currentAllocated + newQuantity > ticket.getTotalCapacity()) {
             int remaining = ticket.getTotalCapacity() - currentAllocated;
+            throw new IllegalArgumentException(
+                "Combined variant quantities would exceed ticket total capacity. Available: %d."
+                    .formatted(remaining)
+            );
+        }
+    }
+
+    // Same validation for updates: excludes the current variant's quantity from the sum
+    // so it isn't counted twice when checking the new value.
+    private void validateQuantityForUpdate(Ticket ticket, TicketVariant current, Integer newQuantity) {
+        if (newQuantity > ticket.getTotalCapacity()) {
+            throw new IllegalArgumentException(
+                "Variant quantity (%d) cannot exceed ticket total capacity (%d)."
+                    .formatted(newQuantity, ticket.getTotalCapacity())
+            );
+        }
+
+        int totalAllocated = ticketVariantRepository.sumQuantityByTicketId(ticket.getId());
+        int allocatedExcludingThis = totalAllocated - current.getQuantity();
+        if (allocatedExcludingThis + newQuantity > ticket.getTotalCapacity()) {
+            int remaining = ticket.getTotalCapacity() - allocatedExcludingThis;
             throw new IllegalArgumentException(
                 "Combined variant quantities would exceed ticket total capacity. Available: %d."
                     .formatted(remaining)
