@@ -11,8 +11,10 @@ import com.br.tickets.repositories.SectionRepository;
 import com.br.tickets.repositories.TicketsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +30,7 @@ public class TicketsService {
                 .toList();
     }
 
+    @Transactional
     public TicketListDTO createTicket(Long eventId, CreateTicketDTO dto) {
         Event event = eventsRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
@@ -44,6 +47,36 @@ public class TicketsService {
                 .build();
 
         return toDTO(ticketsRepository.save(ticket));
+    }
+
+    @Transactional
+    public TicketListDTO updateTicket(Long eventId, UUID ticketId, CreateTicketDTO dto) {
+        Event event = eventsRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+        Ticket ticket = ticketsRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+
+        Section section = sectionRepository.findById(dto.sectionId())
+                .orElseThrow(() -> new RuntimeException("Section not found with id: " + dto.sectionId()));
+
+        ticket.setName(dto.name());
+        ticket.setObs(dto.obs());
+        ticket.setTotalCapacity(dto.totalCapacity());
+        ticket.setSection(section);
+
+        return toDTO(ticketsRepository.save(ticket));
+    }
+
+    @Transactional
+    public void deleteTicket(Long eventId, UUID ticketId) {
+        Event event = eventsRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + eventId));
+
+        Ticket ticket = ticketsRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+
+        ticketsRepository.delete(ticket);
     }
 
     private TicketListDTO toDTO(Ticket ticket) {

@@ -18,12 +18,14 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.List;
 import java.util.UUID;
+import static java.util.UUID.randomUUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -100,6 +102,56 @@ class TicketsControllerTest {
         mockMvc.perform(post("/api/events/99/tickets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void update_validPayload_returnsOk() throws Exception {
+        UUID ticketId = randomUUID();
+        CreateTicketDTO dto = new CreateTicketDTO("Inteira Updated", 2L, 6000, null);
+        TicketListDTO response = new TicketListDTO(
+                ticketId, "Inteira Updated", null, 6000, 2L, "VIP", List.of());
+
+        when(ticketsService.updateTicket(eq(1L), eq(ticketId), any(CreateTicketDTO.class))).thenReturn(response);
+
+        mockMvc.perform(put("/api/events/1/tickets/{ticketId}", ticketId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Inteira Updated"))
+                .andExpect(jsonPath("$.totalCapacity").value(6000));
+    }
+
+    @Test
+    void update_ticketNotFound_returns404() throws Exception {
+        UUID ticketId = randomUUID();
+        CreateTicketDTO dto = new CreateTicketDTO("Inteira", 1L, 5000, null);
+
+        when(ticketsService.updateTicket(eq(1L), eq(ticketId), any(CreateTicketDTO.class)))
+                .thenThrow(new RuntimeException("Ticket not found with id: " + ticketId));
+
+        mockMvc.perform(put("/api/events/1/tickets/{ticketId}", ticketId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void delete_validIds_returns204() throws Exception {
+        UUID ticketId = randomUUID();
+        doNothing().when(ticketsService).deleteTicket(1L, ticketId);
+
+        mockMvc.perform(delete("/api/events/1/tickets/{ticketId}", ticketId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void delete_ticketNotFound_returns404() throws Exception {
+        UUID ticketId = randomUUID();
+        doThrow(new RuntimeException("Ticket not found with id: " + ticketId))
+                .when(ticketsService).deleteTicket(1L, ticketId);
+
+        mockMvc.perform(delete("/api/events/1/tickets/{ticketId}", ticketId))
                 .andExpect(status().isNotFound());
     }
 }

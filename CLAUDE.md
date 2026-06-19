@@ -190,6 +190,9 @@ class ExampleControllerTest {
 - `PUT /api/events/{id}` — update event
 - `DELETE /api/events/{id}` — soft-delete event
 - `GET /api/tickets?eventId=` — tickets with variants by event
+- `POST /api/events/{eventId}/tickets` — create ticket for event in a section
+- `PUT /api/events/{eventId}/tickets/{ticketId}` — update ticket
+- `DELETE /api/events/{eventId}/tickets/{ticketId}` — soft-delete ticket
 - `GET /api/tickets/{ticketId}/variants` — list variants for a ticket
 - `POST /api/tickets/{ticketId}/variants` — create variant (validates quantity against parent capacity)
 - `PUT /api/tickets/{ticketId}/variants/{variantId}` — update variant with capacity validation
@@ -217,7 +220,6 @@ class ExampleControllerTest {
 - `VenueListDTO` and `EventListDTO` expose proper DTOs (no JPA entities in responses)
 
 ### To implement 🔲
-- `PUT` / `DELETE` for tickets
 - `DELETE` for venues and sections
 - `GET /admin/events` — admin listing with ADMIN role (uncomment and implement)
 - Checkout flow (`CheckoutController` — stub exists, implement order logic)
