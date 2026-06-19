@@ -27,6 +27,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -139,6 +141,42 @@ public class EventsControllerTest {
         mockMvc.perform(put("/api/events/99")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void findById_validId_returnsEvent() throws Exception {
+        when(eventsService.findById(1L)).thenReturn(SAMPLE_EVENT);
+
+        mockMvc.perform(get("/api/events/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Test Event"))
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+    }
+
+    @Test
+    void findById_notFound_returns404() throws Exception {
+        when(eventsService.findById(99L))
+                .thenThrow(new RuntimeException("Event not found with id: 99"));
+
+        mockMvc.perform(get("/api/events/99"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void delete_validId_returns204() throws Exception {
+        doNothing().when(eventsService).deleteEvent(1L);
+
+        mockMvc.perform(delete("/api/events/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void delete_notFound_returns404() throws Exception {
+        doThrow(new RuntimeException("Event not found with id: 99"))
+                .when(eventsService).deleteEvent(99L);
+
+        mockMvc.perform(delete("/api/events/99"))
                 .andExpect(status().isNotFound());
     }
 }

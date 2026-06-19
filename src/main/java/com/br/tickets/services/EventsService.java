@@ -79,6 +79,13 @@ public class EventsService {
         return toDTO(eventsRepository.save(event));
     }
 
+    @Transactional
+    public void deleteEvent(Long id) {
+        Event event = eventsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
+        eventsRepository.delete(event);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private Venue resolveVenue(Long venueId) {

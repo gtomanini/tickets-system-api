@@ -185,10 +185,14 @@ class ExampleControllerTest {
 
 ### Implemented ✅
 - `GET /api/events` — paginated listing with name and status filters
-- `POST /api/events` — event creation
+- `GET /api/events/{id}` — fetch event by ID
+- `POST /api/events` — event creation with venue, categories, tags, age rating
+- `PUT /api/events/{id}` — update event
+- `DELETE /api/events/{id}` — soft-delete event
 - `GET /api/tickets?eventId=` — tickets with variants by event
 - `GET /api/tickets/{ticketId}/variants` — list variants for a ticket
 - `POST /api/tickets/{ticketId}/variants` — create variant (validates quantity against parent capacity)
+- `PUT /api/tickets/{ticketId}/variants/{variantId}` — update variant with capacity validation
 - `GET /api/venues` — venue listing
 - `GET /api/venues/{id}` — venue by ID
 - JWT infrastructure (filter, service, util) — working but endpoints commented out
@@ -213,10 +217,10 @@ class ExampleControllerTest {
 - `VenueListDTO` and `EventListDTO` expose proper DTOs (no JPA entities in responses)
 
 ### To implement 🔲
+- `PUT` / `DELETE` for tickets
+- `DELETE` for venues and sections
 - `GET /admin/events` — admin listing with ADMIN role (uncomment and implement)
 - Checkout flow (`CheckoutController` — stub exists, implement order logic)
-- `PUT` / `DELETE` for events and tickets
-- `DELETE` for venues and sections
 
 ---
 
